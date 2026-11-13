@@ -74,19 +74,10 @@ h1,h2,h3{font-family:'Inter Tight',Inter,sans-serif;font-weight:500;letter-spaci
 <h2 style="margin:0;font-size:48px;line-height:1;text-align:center;color:#8a8a85"><span style="color:#111">Entra a cada</span> pilar</h2>
 <p style="margin:0;font-size:13px;letter-spacing:3px;color:#8a8a85">SIGUE BAJANDO</p>
 <div id="stage" style="{{stageStyle}}">
-<sc-if value="{{mob}}" hint-placeholder-val="{{ false }}"><sc-for list="{{items}}" as="item" hint-placeholder-count="4">
-<a id="{{item.anchor}}" class="card" href="#{{item.anchor}}" style="{{item.cardStyle}}">
-<div style="position:relative;overflow:hidden;border-radius:20px;height:220px;background:{{item.tone}}">
-<div style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;font-size:11px;letter-spacing:3px;color:#8a8a85">[FOTO · {{item.title}}]</div>
-<div class="im" role="img" aria-label="{{item.title}}" style="{{item.photoStyle}}"></div>
-<span class="vp" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:999px;padding:11px 20px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.12)">Ver pilar</span></div>
-<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:16px 6px 4px"><span style="font-family:'Inter Tight',sans-serif;font-size:22px;letter-spacing:-.02em;line-height:1.1">{{item.title}}</span><span style="font-size:13px;color:#8a8a85">{{item.num}}</span></div>
-</a>
-</sc-for></sc-if>
 </div>
 </div>
 </section>
-<sc-if value="{{desk}}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:0;top:0;width:100%;height:0;z-index:5;pointer-events:none">
+<sc-if value="{{deck}}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:0;top:0;width:100%;height:0;z-index:5;pointer-events:none">
 <sc-for list="{{items}}" as="item" hint-placeholder-count="4"><a id="{{item.anchor}}" class="card" href="#{{item.anchor}}" style="{{item.deckStyle}}">
 <div style="position:relative;overflow:hidden;border-radius:20px;height:220px;background:{{item.tone}}">
 <div style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;font-size:11px;letter-spacing:3px;color:#8a8a85">[FOTO · {{item.title}}]</div>
@@ -349,14 +340,20 @@ const x = lp(pileX + X0[i], q2.cx + X1[i] * sc2, t);
 const y = pileY + (q2.cy - pileY) * q2.p + lp(Y0[i], Y1[i] * sc2, t);
 it.deckStyle = 'position:absolute;left:0;top:0;width:380px;pointer-events:auto;background:#fff;border:1px solid #e4e2dc;border-radius:26px;padding:10px;box-sizing:border-box;box-shadow:0 14px 40px rgba(0,0,0,.12);will-change:transform;z-index:' + (i + 1) + ';transform:translate(-50%,-50%) translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + lp(R0[i], 0, t).toFixed(2) + 'deg) scale(' + lp(0.55, sc2, t).toFixed(3) + ')';
 });
-if (this.state.w < 760) items.forEach((it) => { it.cardStyle = 'display:block;position:relative;width:100%;background:#fff;border:1px solid #e4e2dc;border-radius:26px;padding:10px;box-sizing:border-box;box-shadow:0 14px 40px rgba(0,0,0,.08)'; });
+if (q2.w < 760) { const W = Math.min(q2.w - 40, 460), H = 290, G = 24, tot = 4 * H + 3 * G, s0 = 0.42, px = q2.sw - W * s0 / 2 - 20;
+items.forEach((it, i) => {
+const t = ease(Math.min(1, Math.max(0, (q2.p - (3 - i) * 0.12) / 0.5)));
+const x = lp(px + X0[i], q2.cx, t);
+const y = pileY + (q2.cy - pileY) * q2.p + lp(Y0[i], -tot / 2 + H / 2 + i * (H + G), t);
+it.deckStyle = 'position:absolute;left:0;top:0;width:' + W + 'px;height:' + H + 'px;pointer-events:auto;background:#fff;border:1px solid #e4e2dc;border-radius:26px;padding:10px;box-sizing:border-box;box-shadow:0 14px 40px rgba(0,0,0,.12);will-change:transform;z-index:' + (i + 1) + ';transform:translate(-50%,-50%) translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + lp(R0[i], 0, t).toFixed(2) + 'deg) scale(' + lp(s0, 1, t).toFixed(3) + ')';
+}); }
 const mob = this.state.w < 760;
 const Q = ['¿Qué es El Gremio?', '¿Quién puede ser agremiado?', '¿Qué beneficios incluye?', '¿Cómo accedo a la zona de agremiados?'];
 const voices=[1,2,3];
 const faqs = Q.map((q, i) => ({ q, n: '0' + (i + 1), open: this.state.faq === i, sign: this.state.faq === i ? '−' : '+', toggle: () => this.setState({ faq: this.state.faq === i ? -1 : i }) }));
 const sc = Math.min(1, Math.max(0.3, (this.state.w - 40) / 900));
 const stageStyle = 'position:relative;width:900px;height:640px;flex:0 0 auto;margin-top:8px;transform:scale(' + sc.toFixed(3) + ');transform-origin:top center';
-return { accent, items, faqs, voices, stageStyle: mob ? 'display:flex;flex-direction:column;gap:20px;width:100%;margin-top:12px' : stageStyle, mob, desk: !mob, nodes, lines, kids, kidLines, desc, panelH, graphStyle, showCta: a >= 0, ctaHref: a >= 0 ? P[a].anchor : '' };
+return { accent, items, faqs, voices, stageStyle: mob ? 'position:relative;width:100%;height:' + (4 * 290 + 3 * 24) + 'px;margin-top:12px' : stageStyle, mob, desk: !mob, deck: true, nodes, lines, kids, kidLines, desc, panelH, graphStyle, showCta: a >= 0, ctaHref: a >= 0 ? P[a].anchor : '' };
 }
 }
 </script>
