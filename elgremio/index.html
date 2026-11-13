@@ -11,7 +11,7 @@
 <helmet>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=Inter+Tight:wght@400;500;600&amp;family=Inter:wght@400;500&amp;display=swap">
 <style>
-body{margin:0;background:#F4F3F0}
+body{margin:0;background:#F4F3F0 linear-gradient(#1b1b1b,#1b1b1b) top/100% 740px no-repeat}
 a{color:inherit;text-decoration:none}
 .nl:hover{opacity:.55}
 .card .vp{opacity:0;transition:opacity .25s}
@@ -47,6 +47,7 @@ h1,h2,h3{font-family:'Inter Tight',Inter,sans-serif;font-weight:500;letter-spaci
 <div style="background:#F4F3F0;color:#111;font-family:Inter,sans-serif;max-width:1440px;margin:0 auto;box-sizing:border-box">
 <div id="intro" style="position:fixed;inset:0;background:#ECEBE7;z-index:50;overflow:hidden"><span id="dot" style="position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#0B0B0B;opacity:0;will-change:transform"></span></div>
 
+<div id="scene" style="position:relative">
 <section id="inicio" class="hero" style="position:relative;height:740px;background:#1b1b1b;color:#fff;display:flex;flex-direction:column;overflow:hidden">
 <canvas id="net" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
 <header style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 32px">
@@ -69,18 +70,29 @@ h1,h2,h3{font-family:'Inter Tight',Inter,sans-serif;font-weight:500;letter-spaci
 <div style="overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:8px;padding:72px 0 56px;box-sizing:border-box">
 <h2 style="margin:0;font-size:48px;line-height:1;text-align:center;color:#8a8a85"><span style="color:#111">Entra a cada</span> pilar</h2>
 <p style="margin:0;font-size:13px;letter-spacing:3px;color:#8a8a85">SIGUE BAJANDO</p>
-<div style="{{stageStyle}}">
-<sc-for list="{{items}}" as="item" hint-placeholder-count="4">
+<div id="stage" style="{{stageStyle}}">
+<sc-if value="{{mob}}" hint-placeholder-val="{{ false }}"><sc-for list="{{items}}" as="item" hint-placeholder-count="4">
 <a id="{{item.anchor}}" class="card" href="#{{item.anchor}}" style="{{item.cardStyle}}">
 <div style="position:relative;overflow:hidden;border-radius:20px;height:220px;background:{{item.tone}}">
-<div class="im" style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;font-size:11px;letter-spacing:3px;color:#8a8a85">[FOTO · {{item.title}}]</div>
+<div style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;font-size:11px;letter-spacing:3px;color:#8a8a85">[FOTO · {{item.title}}]</div>
+<div class="im" role="img" aria-label="{{item.title}}" style="{{item.photoStyle}}"></div>
 <span class="vp" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:999px;padding:11px 20px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.12)">Ver pilar</span></div>
 <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:16px 6px 4px"><span style="font-family:'Inter Tight',sans-serif;font-size:22px;letter-spacing:-.02em;line-height:1.1">{{item.title}}</span><span style="font-size:13px;color:#8a8a85">{{item.num}}</span></div>
 </a>
-</sc-for>
+</sc-for></sc-if>
 </div>
 </div>
 </section>
+<sc-if value="{{desk}}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:0;top:0;width:100%;height:0;z-index:5;pointer-events:none">
+<sc-for list="{{items}}" as="item" hint-placeholder-count="4"><a id="{{item.anchor}}" class="card" href="#{{item.anchor}}" style="{{item.deckStyle}}">
+<div style="position:relative;overflow:hidden;border-radius:20px;height:220px;background:{{item.tone}}">
+<div style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;font-size:11px;letter-spacing:3px;color:#8a8a85">[FOTO · {{item.title}}]</div>
+<div class="im" role="img" aria-label="{{item.title}}" style="{{item.photoStyle}}"></div>
+<span class="vp" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:999px;padding:11px 20px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.12)">Ver pilar</span></div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:16px 6px 4px"><span style="font-family:'Inter Tight',sans-serif;font-size:22px;letter-spacing:-.02em;line-height:1.1">{{item.title}}</span><span style="font-size:13px;color:#8a8a85">{{item.num}}</span></div>
+</a></sc-for>
+</div></sc-if>
+</div>
 
 <section id="que-es" style="padding:96px 48px;display:flex;flex-wrap:wrap;gap:56px;align-items:center">
 <div id="video" style="flex:1.2 1 520px;position:relative;aspect-ratio:16/10;background:#1b1b1b;border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.14)">
@@ -175,18 +187,22 @@ h1,h2,h3{font-family:'Inter Tight',Inter,sans-serif;font-weight:500;letter-spaci
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px"><span style="font-family:'Cormorant Garamond',serif;font-size:clamp(44px,13vw,150px);line-height:.9;letter-spacing:clamp(2px,.6vw,8px);color:#F4F3F0">EL GREMIO</span><span style="font-size:13px;color:#a8a49b">© 2026 El Gremio · Tuluá, Colombia</span></div>
 </section>
 
-<div style="position:sticky;bottom:20px;height:0;display:flex;justify-content:center;pointer-events:none">
+<div style="position:sticky;bottom:20px;height:0;display:flex;justify-content:center;pointer-events:none;z-index:20">
 <a href="#agremiados" style="pointer-events:auto;transform:translateY(-56px);background:#111;color:#fff;border-radius:999px;padding:12px 14px 12px 24px;display:flex;align-items:center;gap:20px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)"><span>Habla con nosotros <span style="color:#a8a49b">· WhatsApp</span></span><span style="background:#fff;color:#111;border-radius:999px;padding:9px 16px;font-size:13px">Escribir</span></a></div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#111111"},"$preview":{"width":1440,"height":6100}}'>
 class Component extends DCLogic {
-constructor(props){ super(props); this.state = { active: -1, faq: 0, p: 0, hov: false, w: 1440 };
+constructor(props){ super(props); this.state = { active: -1, faq: 0, p: 0, hov: false, w: 1440, cx: 720, cy: 1220, sw: 1440 };
 this.onScroll = () => { if (this.raf) return; this.raf = requestAnimationFrame(() => { this.raf = 0;
-const el = document.getElementById('cartas'); if (!el) return;
-const r = el.getBoundingClientRect(); const vh = window.innerHeight, c = r.top + 480;
-const p = Math.min(1, Math.max(0, (vh * 1.05 - c) / (vh * 0.75)));
-if (Math.abs(p - this.state.p) > 0.003 || window.innerWidth !== this.state.w) this.setState({ p, w: window.innerWidth }); }); };
+const sc = document.getElementById('scene'), st = document.getElementById('stage'); if (!sc || !st) return;
+const vw = window.innerWidth, vh = window.innerHeight;
+const sr = sc.getBoundingClientRect(), r = st.getBoundingClientRect();
+const cx = r.left - sr.left + r.width / 2, cy = r.top - sr.top + r.height / 2;
+const p = Math.min(1, Math.max(0, -sr.top / Math.max(200, cy - (170 + r.height / 2))));
+const q = this.state;
+if (Math.abs(p - q.p) > 0.002 || vw !== q.w || Math.abs(cx - q.cx) > 1 || Math.abs(cy - q.cy) > 1 || Math.abs(sr.width - q.sw) > 1) this.setState({ p, w: vw, cx, cy, sw: sr.width });
+}); };
 }
 componentDidMount(){ window.addEventListener('scroll', this.onScroll, true); window.addEventListener('resize', this.onScroll); this.onScroll(); try { this.intro(); } catch (e) { this.introFail(); } try { this.net(); } catch (e) {} setTimeout(() => this.introFail(), 9500); }
 introFail(){
@@ -278,10 +294,10 @@ componentWillUnmount(){ window.removeEventListener('scroll', this.onScroll, true
 renderVals() {
 const accent = this.props.accent ?? '#111111';
 const P = [
-{ anchor:'educacion', title:'Educación empresarial', icon:'M2 9l10-5 10 5-10 5z M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5', text:'Formación práctica para quienes dirigen o quieren dirigir un negocio.' },
-{ anchor:'empresa', title:'Creación de empresa', icon:'M4 21V4h10v17 M14 9h6v12 M4 21h16 M8 8h2 M8 12h2 M8 16h2', text:'Acompañamiento para convertir una idea en una empresa constituida.' },
-{ anchor:'networking', title:'Networking', icon:'M12 3.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5z M5 15.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5z M19 15.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5z M12 8.5v3 M7 15.5l3.5-4 M17 15.5l-3.5-4', text:'Espacios para conocer, conectar y hacer negocios con otros agremiados.' },
-{ anchor:'social', title:'Labor social', icon:'M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z', text:'Iniciativas con las que el Gremio aporta a la comunidad.' }
+{ anchor:'educacion', img:'img/educacion.jpg', title:'Educación empresarial', icon:'M2 9l10-5 10 5-10 5z M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5', text:'Formación práctica para quienes dirigen o quieren dirigir un negocio.' },
+{ anchor:'empresa', img:'img/empresa.jpg', title:'Creación de empresa', icon:'M4 21V4h10v17 M14 9h6v12 M4 21h16 M8 8h2 M8 12h2 M8 16h2', text:'Acompañamiento para convertir una idea en una empresa constituida.' },
+{ anchor:'networking', img:'img/networking.jpg', title:'Networking', icon:'M12 3.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5z M5 15.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5z M19 15.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5z M12 8.5v3 M7 15.5l3.5-4 M17 15.5l-3.5-4', text:'Espacios para conocer, conectar y hacer negocios con otros agremiados.' },
+{ anchor:'social', img:'img/social.jpg', title:'Labor social', icon:'M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z', text:'Iniciativas con las que el Gremio aporta a la comunidad.' }
 ];
 const off = [64, 16, 16, 64];
 const a = this.state.active;
@@ -295,6 +311,7 @@ const on = i === a;
 const t = ease(Math.min(1, Math.max(0, (pr - (3 - i) * 0.15) / 0.45)));
 const L = (a, b) => a + (b - a) * t;
 return { ...p, num: '0' + (i + 1), tone: tones[i],
+photoStyle: "position:absolute;inset:0;background:url('" + p.img + "') center/cover no-repeat",
 cardStyle: 'position:absolute;left:50%;top:50%;width:380px;background:#fff;border:1px solid #e4e2dc;border-radius:26px;padding:10px;box-sizing:border-box;box-shadow:0 14px 40px rgba(0,0,0,.10);will-change:transform;z-index:' + (i + 1) + ';transform:translate(-50%,-50%) translate(' + L(X0[i], X1[i]).toFixed(1) + 'px,' + L(Y0[i], Y1[i]).toFixed(1) + 'px) rotate(' + L(R0[i], R1[i]).toFixed(2) + 'deg)',
 hover: () => this.setState({ active: i }),
 iconColor: on ? '#fff' : '#111',
@@ -320,6 +337,15 @@ const gsc = Math.min(1, Math.max(0.3, (this.state.w - 96) / 1000));
 const panelH = (640 * gsc).toFixed(0);
 const graphStyle = 'position:absolute;left:50%;top:0;width:1000px;height:640px;transform:translateX(-50%) scale(' + gsc.toFixed(3) + ');transform-origin:top center';
 const desc = a >= 0 ? P[a].text : 'Cuatro pilares sostienen El Gremio. Pasa el mouse sobre cada uno para conocerlo.';
+const q2 = this.state, sc2 = Math.min(1, Math.max(0.3, (q2.w - 40) / 900));
+const pileX = q2.sw - Math.min(360, q2.sw * 0.28), pileY = 540;
+const lp = (a, b, t) => a + (b - a) * t;
+items.forEach((it, i) => {
+const t = ease(Math.min(1, Math.max(0, (q2.p - (3 - i) * 0.12) / 0.5)));
+const x = lp(pileX + X0[i], q2.cx + X1[i] * sc2, t);
+const y = pileY + (q2.cy - pileY) * q2.p + lp(Y0[i], Y1[i] * sc2, t);
+it.deckStyle = 'position:absolute;left:0;top:0;width:380px;pointer-events:auto;background:#fff;border:1px solid #e4e2dc;border-radius:26px;padding:10px;box-sizing:border-box;box-shadow:0 14px 40px rgba(0,0,0,.12);will-change:transform;z-index:' + (i + 1) + ';transform:translate(-50%,-50%) translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + lp(R0[i], 0, t).toFixed(2) + 'deg) scale(' + lp(0.55, sc2, t).toFixed(3) + ')';
+});
 if (this.state.w < 760) items.forEach((it) => { it.cardStyle = 'display:block;position:relative;width:100%;background:#fff;border:1px solid #e4e2dc;border-radius:26px;padding:10px;box-sizing:border-box;box-shadow:0 14px 40px rgba(0,0,0,.08)'; });
 const mob = this.state.w < 760;
 const Q = ['¿Qué es El Gremio?', '¿Quién puede ser agremiado?', '¿Qué beneficios incluye?', '¿Cómo accedo a la zona de agremiados?'];
