@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>El Gremio — Administración</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600;700&display=swap">
+<style>
+:root{--f-sans:'Nunito Sans',system-ui,sans-serif;--f-serif:'Playfair Display',Georgia,serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;background:#0B0B0B;color:#F4F3F0;font-family:var(--f-sans)}
+a{color:inherit;text-decoration:none}
+header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 32px}
+.logo{font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:6px}
+main{padding:24px 32px 56px;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:32px}
+h1{margin:0;font-family:var(--f-serif);font-size:clamp(34px,6vw,56px)}
+h2{margin:0 0 16px;font-family:var(--f-serif);font-size:22px}
+.panel{background:#161616;border:1px solid #2a2a2a;border-radius:18px;padding:24px}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;align-items:end}
+label{display:flex;flex-direction:column;gap:6px;font-size:12px;letter-spacing:.14em;color:#b9b6ae}
+input{height:46px;background:#0f0f0f;border:1px solid #333;border-radius:10px;color:#F4F3F0;padding:0 14px;font-size:15px;font-family:inherit}
+input:focus{outline:none;border-color:#6a6a66}
+button,.btn{height:46px;padding:0 20px;background:#F4F3F0;color:#111;border:0;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+button.sec{background:transparent;color:#F4F3F0;border:1px solid #444}
+button.sm{height:34px;padding:0 14px;font-size:13px}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px}
+.msg{margin:14px 0 0;min-height:20px;font-size:14px;line-height:1.5}
+.ok{color:#8fd19e}.er{color:#e08a7a}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:12px 10px;border-top:1px solid #2a2a2a;white-space:nowrap}
+th{font-size:11px;letter-spacing:.14em;color:#8a8780;font-weight:600;border-top:0}
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;background:#1f2a21;color:#8fd19e}
+.tag.off{background:#2a1f1f;color:#e08a7a}
+#bloq{display:none;padding:72px 0;text-align:center;color:#b9b6ae}
+</style>
+</head>
+<body>
+<header>
+<a class="logo" href="index.html" aria-label="El Gremio">EL GREMIO</a>
+<a href="miembros.html">← Volver al portal</a>
+</header>
+<main id="app" style="display:none">
+<h1>Administración</h1>
+<section class="panel">
+<h2>Crear miembro</h2>
+<form id="f" autocomplete="off">
+<label>CÓDIGO<input id="codigo" required maxlength="30" placeholder="GR002"></label>
+<label>NOMBRE<input id="nombre" required maxlength="120"></label>
+<label>CORREO (opcional)<input id="correo" type="email" maxlength="160"></label>
+<label>CONTRASEÑA<input id="clave" required minlength="8" maxlength="100"></label>
+<div class="row"><button type="button" class="sec" id="gen">Generar clave</button><button type="submit" id="crear">Crear</button></div>
+</form>
+<p class="msg" id="msg" role="status"></p>
+</section>
+<section class="panel">
+<h2>Miembros</h2>
+<div class="tw"><table>
+<thead><tr><th>CÓDIGO</th><th>NOMBRE</th><th>CORREO</th><th>ESTADO</th><th>INGRESO</th><th>ÚLTIMO ACCESO</th><th></th></tr></thead>
+<tbody id="lista"></tbody>
+</table></div>
+</section>
+</main>
+<div id="bloq"><p>Acceso restringido a administradores.</p><p><a href="miembros.html" style="text-decoration:underline">Ir al portal</a></p></div>
+<script>
+const $ = (id) => document.getElementById(id);
+let YO = null;
+
+function aviso(t, ok) { const m = $('msg'); m.textContent = t; m.className = 'msg ' + (ok ? 'ok' : 'er'); }
+
+async function api(method, body) {
+  const r = await fetch('/api/admin/miembros', {
+    method, credentials: 'same-origin',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Error ' + r.status);
+  return j;
+}
+
+function generarClave() {
+  const c = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const a = new Uint32Array(12); crypto.getRandomValues(a);
+  return Array.from(a, (n) => c[n % c.length]).join('');
+}
+
+function celda(txt) { const td = document.createElement('td'); td.textContent = txt || '—'; return td; }
+
+async function cargar() {
+  const { miembros } = await api('GET');
+  const tb = $('lista'); tb.textContent = '';
+  miembros.forEach((m) => {
+    const tr = document.createElement('tr');
+    tr.append(celda(m.codigo + (m.admin ? ' ★' : '')), celda(m.nombre), celda(m.correo));
+    const te = document.createElement('td'); const tag = document.createElement('span');
+    tag.className = 'tag' + (m.estado === 'ACTIVO' ? '' : ' off'); tag.textContent = m.estado === 'ACTIVO' ? 'Activo' : 'Inactivo'; te.appendChild(tag);
+    tr.append(te, celda(m.ingreso), celda(m.acceso));
+    const ta = document.createElement('td'); const row = document.createElement('div'); row.className = 'row';
+    const bc = document.createElement('button'); bc.className = 'sec sm'; bc.textContent = 'Nueva clave';
+    bc.onclick = async () => {
+      const k = prompt('Nueva contraseña para ' + m.codigo + ' (mínimo 8 caracteres):', generarClave());
+      if (!k) return;
+      try { await api('PATCH', { id: m.id, clave: k }); aviso('Contraseña de ' + m.codigo + ' cambiada. Nueva clave: ' + k, true); } catch (e) { aviso(e.message, false); }
+    };
+    row.appendChild(bc);
+    if (m.id !== YO) {
+      const be = document.createElement('button'); be.className = 'sec sm'; be.textContent = m.estado === 'ACTIVO' ? 'Desactivar' : 'Activar';
+      be.onclick = async () => {
+        try { await api('PATCH', { id: m.id, estado: m.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO' }); await cargar(); } catch (e) { aviso(e.message, false); }
+      };
+      row.appendChild(be);
+    }
+    ta.appendChild(row); tr.appendChild(ta); tb.appendChild(tr);
+  });
+}
+
+$('gen').onclick = () => { $('clave').value = generarClave(); };
+
+$('f').addEventListener('submit', async (e) => {
+  e.preventDefault(); $('crear').disabled = true; aviso('', true);
+  const d = { codigo: $('codigo').value.trim(), nombre: $('nombre').value.trim(), correo: $('correo').value.trim(), clave: $('clave').value };
+  try {
+    await api('POST', d);
+    aviso('Miembro creado. Código: ' + d.codigo + ' · Clave: ' + d.clave + ' (cópiala ahora, no se vuelve a mostrar).', true);
+    $('f').reset(); await cargar();
+  } catch (err) { aviso(err.message, false); }
+  $('crear').disabled = false;
+});
+
+(async () => {
+  try {
+    const r = await fetch('/api/me', { credentials: 'same-origin' });
+    const d = r.ok ? await r.json() : null;
+    if (!d || !d.miembro.es_admin) throw new Error('no');
+    YO = d.miembro.id;
+    await cargar();
+    $('app').style.display = 'flex';
+  } catch (_) { $('bloq').style.display = 'block'; }
+})();
+</script>
+</body>
+</html>
