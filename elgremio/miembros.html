@@ -63,7 +63,7 @@ button:disabled{opacity:.5;cursor:default}
 <section id="portal">
 <div class="top">
 <div><h1 style="font-size:clamp(36px,6vw,64px)"><span id="hola"></span></h1><p id="sub"></p></div>
-<button class="out" id="salir" type="button">Cerrar sesión</button>
+<div style="display:flex;gap:12px;flex-wrap:wrap"><a id="adm" class="out" href="admin.html" style="display:none;align-items:center;border-radius:999px;font-size:15px">Panel admin</a><button class="out" id="salir" type="button">Cerrar sesión</button></div>
 </div>
 <div class="grid" id="lista"></div>
 </section>
@@ -78,6 +78,7 @@ function mostrarPortal(d) {
   $('portal').style.display = 'flex';
   $('hola').textContent = 'Hola, ' + d.miembro.nombre.split(' ')[0];
   $('sub').textContent = 'Código ' + d.miembro.codigo + ' · Agremiado desde ' + d.miembro.ingreso;
+  $('adm').style.display = d.miembro.es_admin ? 'flex' : 'none';
   const lista = $('lista'); lista.textContent = '';
   if (!d.contenido.length) { const p = document.createElement('p'); p.textContent = 'Aún no hay contenido publicado.'; lista.appendChild(p); }
   d.contenido.forEach((c) => {
