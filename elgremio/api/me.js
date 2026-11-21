@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
   try {
     const data = await withConn(async (conn) => {
       const u = await conn.execute(
-        `SELECT codigo, nombre, correo, TO_CHAR(fecha_ingreso,'YYYY-MM-DD') AS ingreso
+        `SELECT id, codigo, nombre, correo, es_admin, TO_CHAR(fecha_ingreso,'YYYY-MM-DD') AS ingreso
            FROM miembros WHERE id = :id AND estado = 'ACTIVO'`, { id });
       if (!u.rows.length) return null;
       const c = await conn.execute(
@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
            FROM contenido_miembros WHERE publicado = 1 ORDER BY fecha DESC, id DESC`);
       const x = u.rows[0];
       return {
-        miembro: { codigo: x.CODIGO, nombre: x.NOMBRE, correo: x.CORREO, ingreso: x.INGRESO },
+        miembro: { id: x.ID, codigo: x.CODIGO, nombre: x.NOMBRE, correo: x.CORREO, es_admin: x.ES_ADMIN === 1, ingreso: x.INGRESO },
         contenido: c.rows.map((r) => ({ titulo: r.TITULO, descripcion: r.DESCRIPCION, url: r.URL, pilar: r.PILAR, fecha: r.FECHA })),
       };
     });
