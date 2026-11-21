@@ -1,0 +1,10 @@
+{
+  "name": "elgremio",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "oracledb": "^6.6.0"
+  }
+}
