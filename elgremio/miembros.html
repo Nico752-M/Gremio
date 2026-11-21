@@ -26,25 +26,100 @@ input:focus{outline:none;border-color:#6a6a66}
 button{height:54px;background:#F4F3F0;color:#111;border:0;border-radius:999px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit}
 button:hover{opacity:.9}
 footer{padding:0 48px 32px;font-size:13px;color:#a8a49b}
+
+.err{margin:0;min-height:20px;font-size:14px;color:#e08a7a}
+button:disabled{opacity:.5;cursor:default}
+#portal{display:none;flex:1 1 100%;flex-direction:column;gap:28px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px}
+.top p{margin:0;color:#b9b6ae}
+.out{height:44px;padding:0 22px;background:transparent;color:#F4F3F0;border:1px solid #444}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.card{background:#161616;border:1px solid #2a2a2a;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;font-family:var(--f-serif);font-size:22px;font-weight:600}
+.card p{margin:0;line-height:1.55;color:#b9b6ae;font-size:15px}
+.card small{color:#8a8780;letter-spacing:.12em;font-size:11px;text-transform:uppercase}
+.card a{text-decoration:underline}
 @media(max-width:700px){main{padding:48px 24px 40px;gap:40px}header{padding:20px 24px}footer{padding:0 24px 28px}}
 </style>
 </head>
 <body>
 <header>
-<a class="logo" href="Main_dc.html" aria-label="El Gremio">EL GREMIO</a>
-<a class="nl back" href="Main_dc.html">← Volver al inicio</a>
+<a class="logo" href="index.html" aria-label="El Gremio">EL GREMIO</a>
+<a class="nl back" href="index.html">← Volver al inicio</a>
 </header>
 <main>
+<div id="vlogin" style="display:contents">
 <h1><span>Zona de</span><br>agremiados</h1>
-<form onsubmit="return false">
+<form id="f" autocomplete="on">
 <p>Ingresa con tu código y contraseña para ver la información reservada a los miembros.</p>
 <label for="codigo">CÓDIGO</label>
-<input id="codigo" type="text" autocomplete="username">
+<input id="codigo" name="codigo" type="text" autocomplete="username" required maxlength="30">
 <label for="clave">CONTRASEÑA</label>
-<input id="clave" type="password" autocomplete="current-password">
-<button type="submit">Ingresar</button>
+<input id="clave" name="clave" type="password" autocomplete="current-password" required maxlength="200">
+<p class="err" id="err" role="alert"></p>
+<button type="submit" id="btn">Ingresar</button>
 </form>
+</div>
+<section id="portal">
+<div class="top">
+<div><h1 style="font-size:clamp(36px,6vw,64px)"><span id="hola"></span></h1><p id="sub"></p></div>
+<button class="out" id="salir" type="button">Cerrar sesión</button>
+</div>
+<div class="grid" id="lista"></div>
+</section>
 </main>
 <footer>© 2026 El Gremio · Tuluá, Colombia</footer>
+<script>
+const $ = (id) => document.getElementById(id);
+const PILARES = { educacion: 'Educación empresarial', empresa: 'Creación de empresa', networking: 'Networking', social: 'Labor social' };
+
+function mostrarPortal(d) {
+  $('vlogin').style.display = 'none';
+  $('portal').style.display = 'flex';
+  $('hola').textContent = 'Hola, ' + d.miembro.nombre.split(' ')[0];
+  $('sub').textContent = 'Código ' + d.miembro.codigo + ' · Agremiado desde ' + d.miembro.ingreso;
+  const lista = $('lista'); lista.textContent = '';
+  if (!d.contenido.length) { const p = document.createElement('p'); p.textContent = 'Aún no hay contenido publicado.'; lista.appendChild(p); }
+  d.contenido.forEach((c) => {
+    const card = document.createElement('div'); card.className = 'card';
+    const tag = document.createElement('small'); tag.textContent = PILARES[c.pilar] || 'General';
+    const h = document.createElement('h3'); h.textContent = c.titulo;
+    card.append(tag, h);
+    if (c.descripcion) { const p = document.createElement('p'); p.textContent = c.descripcion; card.appendChild(p); }
+    if (c.url && /^https?:\/\//i.test(c.url)) { const a = document.createElement('a'); a.href = c.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Abrir'; card.appendChild(a); }
+    lista.appendChild(card);
+  });
+}
+
+async function cargarSesion() {
+  try {
+    const r = await fetch('/api/me', { credentials: 'same-origin' });
+    if (r.ok) mostrarPortal(await r.json());
+  } catch (_) {}
+}
+
+$('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('err').textContent = ''; $('btn').disabled = true; $('btn').textContent = 'Ingresando…';
+  try {
+    const r = await fetch('/api/login', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo: $('codigo').value, clave: $('clave').value })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { $('err').textContent = j.error || 'No se pudo ingresar.'; }
+    else { $('clave').value = ''; await cargarSesion(); }
+  } catch (_) { $('err').textContent = 'Sin conexión. Intenta de nuevo.'; }
+  $('btn').disabled = false; $('btn').textContent = 'Ingresar';
+});
+
+$('salir').addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
+  location.reload();
+});
+
+cargarSesion();
+</script>
 </body>
 </html>
