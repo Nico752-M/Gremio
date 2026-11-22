@@ -1,21 +1,13 @@
-# Inicio — design reference
+# El Gremio
 
-This is a design mockup created in a visual design tool, exported as a
-standalone page. Treat it as a REFERENCE MOCKUP, not production code:
-the markup and inline styles carry the design's precise values — colors,
-font sizes, spacing, radii, shadows, layout — which an implementation
-should replicate faithfully in its own components and styling system
-rather than copy wholesale.
+Sitio web con zona de agremiados.
 
-## Contents
+- `index.html` — página de inicio.
+- `miembros.html` — login y portal de agremiados (usa `portal-extra.css/js` para las secciones adicionales).
+- `admin.html` — panel de administración (crear y gestionar miembros).
+- `demo.html` — vista previa del portal con datos de ejemplo, sin backend (solo para mostrar).
+- `api/` — funciones serverless (login, logout, me, admin/miembros). Requieren Oracle (`oracledb`) y `SESSION_SECRET` (mín. 32 caracteres).
+- `scripts/crear-miembro.js` — crea miembros desde la terminal.
 
-- `Main.dc.html` — the artboard (a Design Component: an `<x-dc>`
-  template + a small logic class). The values to replicate live in its
-  inline `style="…"` attributes and the `<helmet><style>` block.
-- `support.js`, `vendor/react*.js` — the runtime that renders the
-  component in a browser; not part of the design.
-
-## Viewing
-
-Serve the folder (e.g. `python3 -m http.server`) and open `Main.dc.html`;
-some browsers block the scripts over file://.
+## Editar el contenido del portal
+Todo el contenido (video, WhatsApp, eventos, galería, aliados, testimonios, recursos, anuncio, preguntas frecuentes) está en el bloque `CONFIG` al inicio de `portal-extra.js`. Las fotos se suben a `img/`.
