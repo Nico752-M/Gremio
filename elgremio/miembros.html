@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>El Gremio — Miembros</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&&family=Nunito+Sans:wght@400;600&&family=Playfair+Display:wght@600;700&&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Nunito+Sans:wght@400;600&family=Playfair+Display:wght@600;700&display=swap">
 <style>
 :root{--f-sans:'Avenir LT Pro','Avenir Next','Avenir','Nunito Sans',system-ui,sans-serif;--f-serif:'ITC Giovanni Std','ITC Giovanni','Playfair Display',Georgia,serif}
 *{box-sizing:border-box}
@@ -42,6 +42,7 @@ button:disabled{opacity:.5;cursor:default}
 .card a{text-decoration:underline}
 @media(max-width:700px){main{padding:48px 24px 40px;gap:40px}header{padding:20px 24px}footer{padding:0 24px 28px}}
 </style>
+<link rel="stylesheet" href="portal-extra.css">
 </head>
 <body>
 <header>
@@ -124,5 +125,6 @@ $('salir').addEventListener('click', async () => {
 
 cargarSesion();
 </script>
+<script src="portal-extra.js" defer></script>
 </body>
 </html>
